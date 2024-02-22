@@ -4,6 +4,9 @@ include_directories(include)
 file(GLOB MY_SOURCES "src/*.c")
 add_executable(hello_world ${MY_SOURCES})
 
+find_package(Threads REQUIRED)
+target_link_libraries(hello_world PRIVATE Threads::Threads)
+
 # Make use of the HAL library
 target_link_libraries(hello_world LINK_PRIVATE hal)
 

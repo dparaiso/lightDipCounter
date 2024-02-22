@@ -3,5 +3,6 @@
     "files.associations": {
         "pthread.h": "c",
         "stdio.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": true
 }
