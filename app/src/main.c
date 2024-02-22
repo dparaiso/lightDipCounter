@@ -3,11 +3,14 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include "hal/button.h"
+#include "sampler.h"
 
 int main()
 {
-    printf("Hello world!\n");
+    Sampler_init(); 
+    Sampler_cleanup(); 
     return 0; 
 
 }

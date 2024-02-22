@@ -19,6 +19,7 @@ typedef struct {
     // Used for recording the event between analysis periods.
     long long prevTimestampInNs;
 } timestamps_t;
+
 static timestamps_t s_eventData[NUM_PERIOD_EVENTS];
 
 static pthread_mutex_t s_lock = PTHREAD_MUTEX_INITIALIZER;
