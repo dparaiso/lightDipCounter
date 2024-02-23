@@ -11,6 +11,7 @@
 #define PORT 12345
 #define BUFFER_SIZE 1024
 pthread_t tid; 
+char lastMsg [BUFFER_SIZE];
 
 void UDP_init() {
   pthread_create(&tid, NULL, &UDP_startListening, NULL); 
@@ -19,6 +20,65 @@ void UDP_init() {
 
 void UDP_cleanup(){
     pthread_cancel(tid); 
+}
+
+static int UDP_receiveAndConnect(int sockId, char* buff, struct sockaddr_in client, int* clientLen) {
+  int bytesRead = recvfrom(sockId, buff, BUFFER_SIZE-1, 0, (struct sockaddr*)&client, (socklen_t *) clientLen);
+  buff[bytesRead-1] = '\0';
+  if(connect(sockId, (struct sockaddr*)&client, *clientLen) == -1) {
+    perror("socket connect failed");
+    exit(EXIT_FAILURE);
+  }
+  return bytesRead;
+}
+
+static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
+  char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop", "/\n\r?/g"};
+  char recvMsg[bytesRead];
+  for(int i = 0; i < bytesRead; i++) {
+    recvMsg[i] = tolower(buff[i]);
+  }
+  if(strncmp(recvMsg, possibleCommands[0], strlen(possibleCommands[0])) == 0 || strncmp(recvMsg, possibleCommands[1], strlen(possibleCommands[1])) == 0) {
+    char newMsg[] = "\nAccepted command examples:\n"
+        "count -- get the total number of samples taken.\n"
+        "length -- get the number of samples taken in the previously completed second.\n"
+        "dips -- get the number of dips in the previously completed second.\n"
+        "history -- get all the samples in the previously completed second.\n"
+        "stop -- cause the server program to end.\n"
+        "<enter> -- repeat last command.\n";
+    strncpy(msg, newMsg, strlen(newMsg)+1);
+  }
+  else if(strncmp(recvMsg, possibleCommands[2], strlen(possibleCommands[2])) == 0) {
+
+  }
+  else if(strncmp(recvMsg, possibleCommands[3], strlen(possibleCommands[3])) == 0) {
+
+  }
+  else if(strncmp(recvMsg, possibleCommands[4], strlen(possibleCommands[4])) == 0) {
+
+  }
+  else if(strncmp(recvMsg, possibleCommands[5], strlen(possibleCommands[5])) == 0) {
+
+  }
+  else if(strncmp(recvMsg, possibleCommands[6], strlen(possibleCommands[6])) == 0) {
+    char newMsg[] = "\nProgram terminating\n";
+    strncpy(msg, newMsg, strlen(newMsg)+1);
+  }
+  else if(strncmp(recvMsg, possibleCommands[7], strlen(possibleCommands[7])) == 0) {
+    strncpy(msg, lastMsg, strlen(lastMsg)+1);
+  }
+  else {
+    char newMsg[] = "\nunknown command\n"; 
+    strncpy(msg, newMsg, strlen(newMsg)+1);
+  }
+}
+
+static void UDP_parseAndSend(int sockId, char* buff, int bytesRead) {
+  char msg[BUFFER_SIZE];
+  UDP_parseMessage(buff, bytesRead, &msg, BUFFER_SIZE);
+  strncpy(lastMsg, msg, strlen(msg)+1);
+  printf("%s\n", lastMsg);
+  send(sockId, msg, sizeof(char)*(strlen(msg)+1), 0);
 }
 
 void* UDP_startListening(void* args) {
@@ -42,22 +102,15 @@ void* UDP_startListening(void* args) {
   printf("Listening on port: %d\n", PORT);
   char buff[BUFFER_SIZE];
   int clientLen = sizeof(client);
+
+  char defaultLastMsg[] = "unknown command\n";
+  strncpy(lastMsg, defaultLastMsg, strlen(defaultLastMsg));
   do {    
-    int bytesRead = recvfrom(sockId, buff, BUFFER_SIZE-1, 0, (struct sockaddr*)&client, (socklen_t *)&(clientLen));
-    printf("%d\n", bytesRead);
-    buff[bytesRead-1] = '\0';
-    if(strcmp(buff, "stop") == 0) {
-      break;
-    }
-    if(connect(sockId, (struct sockaddr*)&client, clientLen) == -1) {
-      perror("socket connect failed");
-      exit(EXIT_FAILURE);
-    }
-    char str[] = "Hello from the server\n";
-    send(sockId, str, strlen(str)+1, 0);
+    int bytesRead = UDP_receiveAndConnect(sockId, buff, client, &clientLen);
+    UDP_parseAndSend(sockId, buff, bytesRead);
   }
   while(strcmp(buff, "stop") != 0);
-  
+
   close(sockId);
   return NULL;
 }
