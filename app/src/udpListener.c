@@ -45,14 +45,6 @@ void* UDP_startListening(void* args) {
     buff[bytesRead-1] = '\0';
     printf("%s\n", buff);
 
-    // for(int i = 0; i < BUFFER_SIZE; i++) {
-    //   if (buff[i] == 0)
-    //         printf("\\0");
-    //   else
-    //     printf("%c", buff[i]);
-    // }
-    // printf("\n");
-
     printf("%d\n", strcmp(buff, "stop"));
     if(strcmp(buff, "stop") == 0) {
       break;
