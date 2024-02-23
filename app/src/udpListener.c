@@ -10,7 +10,7 @@
 #include "sampler.h"
 
 #define PORT 12345
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 16384 //16384
 pthread_t tid; 
 char lastMsg [BUFFER_SIZE];
 
@@ -63,17 +63,17 @@ static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
 
   }
   else if(strncmp(recvMsg, possibleCommands[5], strlen(possibleCommands[5])) == 0) {
-    int len = 0;
+    msg[0] = '\0';
+    int len = Sampler_getHistorySize();
     double* history = Sampler_getHistory(&len);
-    // printf("len: %d\n", len);
-    //TODO: not tested at all, probably doesn't work
+    
     for(int i = 0; i < len; i++) {
       char str[50];
-      sprintf(str,"%f,", history[i]);
-      printf("%s\n", str);
-      strncat(msg, str, strlen(str)+1);
+      sprintf(str,"%d, ", (int)history[i]);
+      strncat(msg, str, strlen(str));
     }
-    msg[len] = '\0';
+    strncat(msg, "\n\n", 3);
+    free(history);
   }
   else if(strncmp(recvMsg, possibleCommands[6], strlen(possibleCommands[6])) == 0) {
     char newMsg[] = "Program terminating\n\n";
