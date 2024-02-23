@@ -23,6 +23,7 @@ void UDP_cleanup(){
 
 void* UDP_startListening(void* args) {
   struct sockaddr_in addr;
+  struct sockaddr_in client;
   int sockId = socket(AF_INET, SOCK_DGRAM, 0);
   if(sockId < 0) {
     perror("socket failed");
@@ -33,25 +34,29 @@ void* UDP_startListening(void* args) {
   addr.sin_addr.s_addr = INADDR_ANY;
   addr.sin_port = htons(PORT);
 
-  if (bind(sockId, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+  if(bind(sockId, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
     perror("socket bind failed");
     exit(EXIT_FAILURE);
   }
 
   printf("Listening on port: %d\n", PORT);
-  while(true) {
-    char buff[BUFFER_SIZE];
-    int bytesRead = read(sockId, buff, BUFFER_SIZE-1);
+  char buff[BUFFER_SIZE];
+  int clientLen = sizeof(client);
+  do {    
+    int bytesRead = recvfrom(sockId, buff, BUFFER_SIZE-1, 0, (struct sockaddr*)&client, (socklen_t *)&(clientLen));
+    printf("%d\n", bytesRead);
     buff[bytesRead-1] = '\0';
-    printf("%s\n", buff);
-
-    printf("%d\n", strcmp(buff, "stop"));
     if(strcmp(buff, "stop") == 0) {
       break;
     }
-    send(sockId, "Hello from the server", 22, 0);
-    printf("Hello message sent\n");
+    if(connect(sockId, (struct sockaddr*)&client, clientLen) == -1) {
+      perror("socket connect failed");
+      exit(EXIT_FAILURE);
+    }
+    char str[] = "Hello from the server\n";
+    send(sockId, str, strlen(str)+1, 0);
   }
+  while(strcmp(buff, "stop") != 0);
   
   close(sockId);
   return NULL;
