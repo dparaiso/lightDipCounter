@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include "udpListener.h"
+#include "sampler.h"
 
 #define PORT 12345
 #define BUFFER_SIZE 1024
@@ -35,10 +36,8 @@ static int UDP_receiveAndConnect(int sockId, char* buff, struct sockaddr_in clie
 static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
   char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop", "0xA"};
   char recvMsg[bytesRead];
-  printf("bytes read: %d\n", bytesRead);
   for(int i = 0; i < bytesRead; i++) {
     recvMsg[i] = tolower(buff[i]);
-    printf("%d ", buff[i]);
   }
   if(strncmp(recvMsg, possibleCommands[0], strlen(possibleCommands[0])) == 0 || strncmp(recvMsg, possibleCommands[1], strlen(possibleCommands[1])) == 0) {
     char newMsg[] = "\nAccepted command examples:\n"
@@ -51,7 +50,8 @@ static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
     strncpy(msg, newMsg, strlen(newMsg)+1);
   }
   else if(strncmp(recvMsg, possibleCommands[2], strlen(possibleCommands[2])) == 0) {
-
+    long long count = Sampler_getNumSamplesTaken();
+    snprintf(msg, "%lld", BUFFER_SIZE);
   }
   else if(strncmp(recvMsg, possibleCommands[3], strlen(possibleCommands[3])) == 0) {
 
@@ -79,7 +79,6 @@ static void UDP_parseAndSend(int sockId, char* buff, int bytesRead) {
   char msg[BUFFER_SIZE];
   UDP_parseMessage(buff, bytesRead, &msg, BUFFER_SIZE);
   strncpy(lastMsg, msg, strlen(msg)+1);
-  printf("%s\n", lastMsg);
   send(sockId, msg, sizeof(char)*(strlen(msg)+1), 0);
 }
 
@@ -114,5 +113,6 @@ void* UDP_startListening(void* args) {
   while(strcmp(buff, "stop") != 0);
 
   close(sockId);
+  UDP_cleanup();
   return NULL;
 }

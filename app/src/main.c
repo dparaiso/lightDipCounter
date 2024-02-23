@@ -11,9 +11,8 @@
 int main()
 {
     UDP_init();
-    // UDP_cleanup();
-    // Sampler_init(); 
-    // Sampler_cleanup(); 
+    Sampler_init(); 
+    Sampler_cleanup(); 
     return 0; 
 
 }
