@@ -6,11 +6,14 @@
 #include <pthread.h>
 #include "hal/button.h"
 #include "sampler.h"
+#include "udpListener.h"
 
 int main()
 {
-    Sampler_init(); 
-    Sampler_cleanup(); 
+    UDP_init();
+    // UDP_cleanup();
+    // Sampler_init(); 
+    // Sampler_cleanup(); 
     return 0; 
 
 }
