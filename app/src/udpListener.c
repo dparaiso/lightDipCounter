@@ -34,43 +34,56 @@ static int UDP_receiveAndConnect(int sockId, char* buff, struct sockaddr_in clie
 }
 
 static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
-  char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop", "0xA"};
+  char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop"};
   char recvMsg[bytesRead];
   for(int i = 0; i < bytesRead; i++) {
     recvMsg[i] = tolower(buff[i]);
   }
   if(strncmp(recvMsg, possibleCommands[0], strlen(possibleCommands[0])) == 0 || strncmp(recvMsg, possibleCommands[1], strlen(possibleCommands[1])) == 0) {
-    char newMsg[] = "\nAccepted command examples:\n"
+    char newMsg[] = "Accepted command examples:\n"
+        "help -- return a brief summary/list of supported commands.\n"
+        "? -- same as help\n"
         "count -- get the total number of samples taken.\n"
         "length -- get the number of samples taken in the previously completed second.\n"
         "dips -- get the number of dips in the previously completed second.\n"
         "history -- get all the samples in the previously completed second.\n"
         "stop -- cause the server program to end.\n"
-        "<enter> -- repeat last command.\n";
+        "<enter> -- repeat last command.\n\n";
     strncpy(msg, newMsg, strlen(newMsg)+1);
   }
   else if(strncmp(recvMsg, possibleCommands[2], strlen(possibleCommands[2])) == 0) {
     long long count = Sampler_getNumSamplesTaken();
-    snprintf(msg, "%lld", BUFFER_SIZE);
+    snprintf(msg, BUFFER_SIZE, "samples taken total: %lld\n\n", count);
   }
   else if(strncmp(recvMsg, possibleCommands[3], strlen(possibleCommands[3])) == 0) {
-
+    int length = Sampler_getHistorySize();
+    snprintf(msg, BUFFER_SIZE, "samples taken last second: %d\n\n", length);
   }
   else if(strncmp(recvMsg, possibleCommands[4], strlen(possibleCommands[4])) == 0) {
 
   }
   else if(strncmp(recvMsg, possibleCommands[5], strlen(possibleCommands[5])) == 0) {
-
+    int len = 0;
+    double* history = Sampler_getHistory(&len);
+    // printf("len: %d\n", len);
+    //TODO: not tested at all, probably doesn't work
+    for(int i = 0; i < len; i++) {
+      char str[50];
+      sprintf(str,"%f,", history[i]);
+      printf("%s\n", str);
+      strncat(msg, str, strlen(str)+1);
+    }
+    msg[len] = '\0';
   }
   else if(strncmp(recvMsg, possibleCommands[6], strlen(possibleCommands[6])) == 0) {
-    char newMsg[] = "\nProgram terminating\n";
+    char newMsg[] = "Program terminating\n\n";
     strncpy(msg, newMsg, strlen(newMsg)+1);
   }
   else if(bytesRead == 1 && recvMsg[0] == '\0') {
     strncpy(msg, lastMsg, strlen(lastMsg)+1);
   }
   else {
-    char newMsg[] = "\nunknown command\n"; 
+    char newMsg[] = "unknown command\n\n"; 
     strncpy(msg, newMsg, strlen(newMsg)+1);
   }
 }
@@ -113,6 +126,5 @@ void* UDP_startListening(void* args) {
   while(strcmp(buff, "stop") != 0);
 
   close(sockId);
-  UDP_cleanup();
   return NULL;
 }
