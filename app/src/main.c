@@ -11,8 +11,10 @@
 int main()
 {
     UDP_init();
-    Sampler_init(); 
-    Sampler_cleanup(); 
+    Sampler_init();
+    while(1);   //keep thread going  
+    Sampler_cleanup(); //use later for shutdown
+
     return 0; 
 
 }

@@ -13,15 +13,17 @@
 #ifndef _SAMPLER_H_
 #define _SAMPLER_H_
 
-
+#define MAX_SAMPLES 1000
 // Begin/end the background thread which samples light levels.
 void Sampler_init(void);
 void Sampler_cleanup(void);
 
+void* Sampler_readSamples();
+void Sampler_exponentialAvgCalculator(int newSample);
 // Must be called once every 1s.
 // Moves the samples that it has been collecting this second into
 // the history, which makes the samples available for reads (below).
-void* Sampler_moveCurrentDataToHistory();
+void Sampler_moveCurrentDataToHistory(void);
 
 
 // Get the number of samples collected during the previous complete second.

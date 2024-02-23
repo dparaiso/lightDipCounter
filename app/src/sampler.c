@@ -10,56 +10,74 @@ long long temp_max = 1000;
 
 pthread_t ptid; 
 double weighting_value = 0.001;
-double history[1000];  
-int hist_pos = 0; 
-int prev_pos = 0; 
+double history[1200];  
+long long num_samples_second = 0; 
 long long num_samples_taken = 0; 
-double ave_reading = 0;
-double prev_ave_reading = 0;  
+double avg_reading = 0;
 
 
 // Begin/end the background thread which samples light levels.
 void Sampler_init(void){
-    pthread_create(&ptid, NULL, &Sampler_moveCurrentDataToHistory, NULL ); 
+    if(pthread_create(&ptid, NULL, &Sampler_readSamples, NULL ) < 0){
+        perror("pthread_create() error in Sampler"); 
+        exit(1); 
+    } 
 }
 
 void Sampler_cleanup(void){
     pthread_cancel(ptid); 
 }
 
+void* Sampler_readSamples(){
+    while(1){
+        Sampler_moveCurrentDataToHistory();
+    }
+    return NULL; 
+}
+
+void Sampler_exponentialAvgCalculator(int newSample){
+    if(num_samples_taken == 0){
+        avg_reading = (double)newSample; 
+    }else{
+        double prev = avg_reading; 
+        avg_reading = weighting_value * newSample + (1-weighting_value)*prev; 
+    }
+}
+
 // Must be called once every 1s.
 // Moves the samples that it has been collecting this second into
 // the history, which makes the samples available for reads (below).
-void* Sampler_moveCurrentDataToHistory(){
+void Sampler_moveCurrentDataToHistory(){
 
-    // get sample and redo ave reading 
-    // loop once every second
-    int lightSample = getVoltage1Reading(); 
-    history[hist_pos] = lightSample; 
-    prev_ave_reading = lightSample; 
-    struct timespec sleep; 
-    sleep.tv_sec = 0.001; 
-    sleep.tv_nsec = 1000000;
-    num_samples_taken++; 
-    hist_pos++; 
-    for(int i = 0; i < 1000000; i++){
-        lightSample = getVoltage1Reading(); 
-        history[hist_pos] = lightSample; 
-        ave_reading = weighting_value * lightSample + (1-weighting_value)*prev_ave_reading; 
-        prev_ave_reading = ave_reading;  
+    int pos = 0; 
+    int lightSample = 0; 
 
-        num_samples_taken++; 
-        hist_pos++; 
-        printf("light sample: %d\tavg: %f\tsamples: %lld\n", lightSample, ave_reading, num_samples_taken); 
-        nanosleep(&sleep, &sleep); 
+    clock_t startingSecondTime = clock(); 
+    while((clock()-startingSecondTime)*1000/CLOCKS_PER_SEC < 1000){
+
+        lightSample = getVoltage1Reading();
+
+        Sampler_exponentialAvgCalculator(lightSample);
+ 
+        history[pos] = lightSample; 
+        // printf("light sample: %d\tavg: %f\tsamples: %lld\tpos: %d\n", lightSample, avg_reading, num_samples_taken, pos); 
+        // printf("current pos: %d\n", pos); 
+        pos++; 
+        num_samples_taken++;
+        clock_t startMS = clock();
+        while((clock()-startMS)*1000/CLOCKS_PER_SEC < 1);
+        
     }
-    // use period timer to check when to redo averageReading 
-    return NULL; 
+
+    //potential mutex here
+    // idea is history = newBuffer; 
+    num_samples_second = pos; 
+
 }
 
 // Get the number of samples collected during the previous complete second.
 int Sampler_getHistorySize(void){
-    return hist_pos - prev_pos; 
+    return num_samples_second; 
 }
 
 // Get a copy of the samples in the sample history.
@@ -68,12 +86,12 @@ int Sampler_getHistorySize(void){
 // The calling code must call free() on the returned pointer.
 // Note: It provides both data and size to ensure consistency.
 double* Sampler_getHistory(int *size){
-    if (*size > hist_pos + 1){ // corner case
+    if (*size > num_samples_second + 1){ // corner case
         return NULL; 
     }
 
     double* copy = (double*)malloc((*size)*sizeof(double)); 
-    for(int i = 0; i < hist_pos; i++){
+    for(int i = 0; i < num_samples_second; i++){
         copy[i] = history[i]; 
     }
 
@@ -82,7 +100,7 @@ double* Sampler_getHistory(int *size){
 
 // Get the average light level (not tied to the history).
 double Sampler_getAverageReading(void){
-    return ave_reading; 
+    return avg_reading; 
 }
 
 // Get the total number of light level samples taken so far.
