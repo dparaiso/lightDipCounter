@@ -33,10 +33,12 @@ static int UDP_receiveAndConnect(int sockId, char* buff, struct sockaddr_in clie
 }
 
 static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
-  char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop", "/\n\r?/g"};
+  char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop", "0xA"};
   char recvMsg[bytesRead];
+  printf("bytes read: %d\n", bytesRead);
   for(int i = 0; i < bytesRead; i++) {
     recvMsg[i] = tolower(buff[i]);
+    printf("%d ", buff[i]);
   }
   if(strncmp(recvMsg, possibleCommands[0], strlen(possibleCommands[0])) == 0 || strncmp(recvMsg, possibleCommands[1], strlen(possibleCommands[1])) == 0) {
     char newMsg[] = "\nAccepted command examples:\n"
@@ -64,7 +66,7 @@ static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
     char newMsg[] = "\nProgram terminating\n";
     strncpy(msg, newMsg, strlen(newMsg)+1);
   }
-  else if(strncmp(recvMsg, possibleCommands[7], strlen(possibleCommands[7])) == 0) {
+  else if(bytesRead == 1 && recvMsg[0] == '\0') {
     strncpy(msg, lastMsg, strlen(lastMsg)+1);
   }
   else {
