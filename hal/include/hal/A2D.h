@@ -8,5 +8,6 @@
 
 int getVoltage1Reading();
 int getVoltage0Reading();
+double convertA2D(double analogSignal);
 
 #endif

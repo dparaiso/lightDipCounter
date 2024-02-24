@@ -42,7 +42,5 @@ long long Sampler_getNumSamplesTaken(void);
 
 void countDips(void);
 
-double convertA2D(double analogSignal);
-
 long long getNumDips();
 #endif
