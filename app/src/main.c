@@ -7,14 +7,14 @@
 #include "hal/button.h"
 #include "sampler.h"
 #include "udpListener.h"
-#include "hal/led.h"
+// #include "hal/led.h"
 
 int main()
 {
     Sampler_init();
     UDP_init();
     Sampler_cleanup(); 
-    UDP_cleanup();
+    // UDP_cleanup();
 
     return 0; 
 

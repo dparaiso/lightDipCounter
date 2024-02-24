@@ -6,7 +6,7 @@
 #include "sampler.h"
 #include "periodTimer.h"
 
-pthread_t tid;
+static pthread_t tid;
 
 void Terminal_init() {
     pthread_create(&tid, NULL, &Terminal_startDisplay, NULL);
