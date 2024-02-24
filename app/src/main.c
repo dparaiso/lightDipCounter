@@ -7,13 +7,13 @@
 #include "hal/button.h"
 #include "sampler.h"
 #include "udpListener.h"
+#include "hal/led.h"
 
 int main()
 {
     Sampler_init();
     UDP_init();
-    // while(1);   //keep thread going  
-    Sampler_cleanup(); //use later for shutdown
+    Sampler_cleanup(); 
     UDP_cleanup();
 
     return 0; 
