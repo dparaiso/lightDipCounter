@@ -48,3 +48,7 @@ int getVoltage0Reading()
     fclose(f);
     return a2dReading;
 }
+
+double convertA2D(double analogSignal){
+    return (analogSignal/A2D_MAX_READING)*A2D_VOLTAGE_REF_V;
+}

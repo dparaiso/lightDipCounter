@@ -143,9 +143,6 @@ void countDips(){
 
 }
 
-double convertA2D(double analogSignal){
-    return (analogSignal/A2D_MAX_READING)*A2D_VOLTAGE_REF_V;
-}
 
 long long getNumDips(){
     return num_dips; 
