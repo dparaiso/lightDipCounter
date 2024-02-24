@@ -1,6 +1,6 @@
 {
-    "C_Cpp.codeAnalysis.clangTidy.enabled": true,
     "files.associations": {
+<<<<<<< HEAD
         "pthread.h": "c",
         "stdio.h": "c",
         "periodtimer.h": "c",
@@ -9,4 +9,8 @@
         "a2d.h": "c"
     },
     "cmake.configureOnOpen": true
+=======
+        "udplistener.h": "c"
+    }
+>>>>>>> origin/udp
 }
