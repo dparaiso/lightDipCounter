@@ -11,10 +11,12 @@
 
 int main()
 {
-    Sampler_init();
-    UDP_init();
-    Sampler_cleanup(); 
-    UDP_cleanup();
+    LED_init();
+    Sampler_init(); 
+    UDP_init(); 
+    LED_cleanup(); 
+    Sampler_cleanup();
+    UDP_cleanup(); 
 
     return 0; 
 
