@@ -60,7 +60,8 @@ static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
     snprintf(msg, BUFFER_SIZE, "samples taken last second: %d\n\n", length);
   }
   else if(strncmp(recvMsg, possibleCommands[4], strlen(possibleCommands[4])) == 0) {
-
+    int dips = getNumDips();
+    snprintf(msg, BUFFER_SIZE, "Dips: %d\n\n", dips);
   }
   else if(strncmp(recvMsg, possibleCommands[5], strlen(possibleCommands[5])) == 0) {
     msg[0] = '\0';
