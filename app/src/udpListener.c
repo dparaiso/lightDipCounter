@@ -81,7 +81,7 @@ static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
   }
   else if(bytesRead == 1 && recvMsg[0] == '\0') {
     strncpy(msg, lastMsg, strlen(lastMsg)+1);
-  }
+  }                            
   else {
     char newMsg[] = "unknown command\n\n"; 
     strncpy(msg, newMsg, strlen(newMsg)+1);
