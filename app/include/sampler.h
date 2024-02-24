@@ -14,6 +14,7 @@
 #define _SAMPLER_H_
 
 #define MAX_SAMPLES 1000
+#define HYSTERSIS 0.03
 // Begin/end the background thread which samples light levels.
 void Sampler_init(void);
 void Sampler_cleanup(void);
@@ -33,9 +34,15 @@ int Sampler_getHistorySize(void);
 // number of elements in the returned array (output-only parameter).
 // The calling code must call free() on the returned pointer.
 // Note: It provides both data and size to ensure consistency.
-double* Sampler_getHistory(int *size);
+double* Sampler_getHistory();
 // Get the average light level (not tied to the history).
 double Sampler_getAverageReading(void);
 // Get the total number of light level samples taken so far.
 long long Sampler_getNumSamplesTaken(void);
+
+void countDips(void);
+
+double convertA2D(double analogSignal);
+
+long long getNumDips();
 #endif
