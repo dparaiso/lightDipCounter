@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include "udpListener.h"
 #include "sampler.h"
+#include "hal/A2D.h"
 
 #define PORT 12345
 #define BUFFER_SIZE 16384 //16384
@@ -21,6 +22,12 @@ void UDP_init() {
 
 void UDP_cleanup(){
     pthread_cancel(tid); 
+}
+
+static float UDP_convertVoltage(float*newHist, double* history, int len) {
+  for(int i = 0; i < len; i++) {
+    newHist[i] = convertA2D(history[i]);
+  }
 }
 
 static int UDP_receiveAndConnect(int sockId, char* buff, struct sockaddr_in client, int* clientLen) {
@@ -66,15 +73,20 @@ static void UDP_parseMessage(char* buff, int bytesRead, char* msg, int msgLen) {
   else if(strncmp(recvMsg, possibleCommands[5], strlen(possibleCommands[5])) == 0) {
     msg[0] = '\0';
     int len = Sampler_getHistorySize();
-    double* history = Sampler_getHistory(&len);
+    double* doubleHist = Sampler_getHistory(&len);
+    float history[len];
+    UDP_convertVoltage(history, doubleHist, len); 
     
     for(int i = 0; i < len; i++) {
       char str[50];
-      sprintf(str,"%d, ", (int)history[i]);
+      sprintf(str,"%.3f, ", history[i]);
+      if((i+1) % 10 == 0) {
+        strncat(str, "\n", 1);
+      }
       strncat(msg, str, strlen(str));
     }
-    strncat(msg, "\n\n", 3);
-    free(history);
+    strncat(msg, "\n\n", 2);
+    free(doubleHist);
   }
   else if(strncmp(recvMsg, possibleCommands[6], strlen(possibleCommands[6])) == 0) {
     char newMsg[] = "Program terminating\n\n";
