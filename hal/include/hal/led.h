@@ -9,8 +9,10 @@
 void LED_init(); 
 void LED_cleanup();
 void* LED_setPWM();
-void LED_Write(char *filename, long long param);
+void LED_write(char *filename, long long param);
+void LED_updateFrequency(int a2dsignal);
 void runCommand(char* command);
 void sleepForMs(long long delayInMs);
+long long getTimeInMs(void);
 
 #endif

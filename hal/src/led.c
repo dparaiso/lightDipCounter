@@ -20,7 +20,7 @@ void LED_init(){
 }
 
 void LED_cleanup(){
-    pthread_cancel(&ptid); 
+    pthread_cancel(ptid); 
 }
 
 void* LED_setPWM(){
@@ -32,17 +32,26 @@ void* LED_setPWM(){
 }
 
 void LED_updateFrequency(int a2dsignal){
-    double newfrequency = (double)a2dsignal/40; 
-    if(newfrequency < 1){
-        newfrequency = 1; 
+    double newfrequency = (double)a2dsignal/40;
+    long long period = 0;  
+
+    if(newfrequency == 0){
+        newfrequency = 0; 
+        if(newfrequency == frequency){
+            return; 
+        }
+        period = 0;
+        duty_cycle = 0;
+    }else{
+        if(newfrequency == frequency){
+            return; 
+        }
+         
+        period = (1/newfrequency) *1000000000;
+        duty_cycle = period/2; 
     }
 
-    if(newfrequency == frequency){
-        return; 
-    }
     frequency = newfrequency; 
-    long long period = (1/frequency) *1000000000;
-    duty_cycle = period/2; 
 
     LED_write(LED_duty_cycle, duty_cycle); 
     LED_write(LED_period, period); 
@@ -100,4 +109,14 @@ void sleepForMs(long long delayInMs){
     struct timespec reqDelay = {seconds, nanoseconds}; 
     nanosleep(&reqDelay, (struct timespec *) NULL);
 
+}
+
+long long getTimeInMs(void)
+{
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    long long seconds = spec.tv_sec;
+    long long nanoSeconds = spec.tv_nsec;
+    long long milliSeconds = seconds * 1000 + nanoSeconds /1000000;
+    return milliSeconds; 
 }
