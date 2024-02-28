@@ -93,13 +93,11 @@ static void UDP_enterMsg(char* msg) {
 }
 
 void UDP_parseMessage(char* buff, int bytesRead, char* msg) { 
-  printf("%s\n", buff);
   char* possibleCommands[] = {"help", "?", "count", "length", "dips", "history", "stop"};
   char recvMsg[bytesRead];
   for(int i = 0; i < bytesRead; i++) {
     recvMsg[i] = tolower(buff[i]);
   }
-  printf("%s\n", recvMsg);
   if(strncmp(recvMsg, possibleCommands[0], strlen(possibleCommands[0])) == 0 || strncmp(recvMsg, possibleCommands[1], strlen(possibleCommands[1])) == 0) {
     UDP_helpMsg(msg);
   }
@@ -129,8 +127,6 @@ void UDP_parseMessage(char* buff, int bytesRead, char* msg) {
 
 static void UDP_parseAndSend(int sockId, char* buff, int bytesRead) {
   char msg[BUFFER_SIZE];
-  printf("buff: %s\n", buff);
-  printf("lastBuff: %s\n", lastBuff);
   UDP_parseMessage(buff, bytesRead, msg);
   strncpy(lastBuff, buff, bytesRead);
 
