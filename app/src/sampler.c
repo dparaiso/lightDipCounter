@@ -13,7 +13,7 @@ double history[MAX_SAMPLES];
 static long long num_samples_second = 0; 
 static long long num_samples_taken = 0; 
 static double avg_reading = 0;
-static long long num_dips = 0; 
+_Atomic long long num_dips = 0; 
 static pthread_mutex_t historyLock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t dipLock = PTHREAD_MUTEX_INITIALIZER;
 static bool dipState = false; 
