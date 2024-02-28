@@ -1,5 +1,6 @@
 #include "sampler.h"
 #include "hal/A2D.h"
+#include "hal/led.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <time.h>
@@ -12,7 +13,7 @@ double history[MAX_SAMPLES];
 static long long num_samples_second = 0; 
 static long long num_samples_taken = 0; 
 static double avg_reading = 0;
-static long long num_dips = 0; 
+_Atomic long long num_dips = 0; 
 static pthread_mutex_t historyLock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t dipLock = PTHREAD_MUTEX_INITIALIZER;
 static bool dipState = false; 
@@ -57,8 +58,9 @@ void Sampler_moveCurrentDataToHistory(){
     int pos = 0; 
     int lightSample = 0; 
     double buffer[MAX_SAMPLES]; 
-    clock_t startingSecondTime = clock(); 
-    while((clock()-startingSecondTime)*1000/CLOCKS_PER_SEC < 1000){ //while time from startingSecondTime is less than second 
+    long long secondAhead = getTimeInMs() + 1000; 
+
+    while(getTimeInMs() < secondAhead){ 
 
         lightSample = getVoltage1Reading();
 
@@ -69,12 +71,10 @@ void Sampler_moveCurrentDataToHistory(){
         // printf("current pos: %d\n", pos); 
         pos++; 
         num_samples_taken++;
-        clock_t startMS = clock();
-        while((clock()-startMS)*1000/CLOCKS_PER_SEC < 1); //while time from startMS is less than 1ms
+        sleepForMs(1); 
         
     }
 
-    //potential mutex here
     pthread_mutex_lock(&historyLock); 
     for(int i = 0; i < pos; i++){
         history[i] = buffer[i]; 
@@ -95,11 +95,13 @@ int Sampler_getHistorySize(void){
 // The calling code must call free() on the returned pointer.
 // Note: It provides both data and size to ensure consistency.
 double* Sampler_getHistory(){
-    // idea is history = newBuffer; 
+    // idea is history = newBuffer;
+    // pthread_mutex_lock(&historyLock);  
     double* copy = (double*)malloc((num_samples_second)*sizeof(double)); 
     for(int i = 0; i < num_samples_second; i++){
         copy[i] = history[i]; 
     }
+    // pthread_mutex_unlock(&historyLock);
     return copy; 
 }
 
@@ -121,23 +123,26 @@ void countDips(){
     int historySize = Sampler_getHistorySize(); 
     double* historyCopy = Sampler_getHistory(); 
     pthread_mutex_unlock(&historyLock); 
-    // bool dipState = false; 
-    // int count = 0; 
+    long long dips = 0; 
     for(int i = 0; i < historySize; i++){
         double sample = convertA2D(historyCopy[i]); 
 
-        if(dipState && ((sample > threshold - HYSTERSIS && sample < threshold + HYSTERSIS) || sample > threshold)){
+        if(!dipState && sample <= threshold-0.1 ){
+            dips++;
+            dipState = true;
+            // flag = 0; 
+
+        }
+
+        if(dipState && sample > threshold - 0.07){
             dipState = false; 
         }
 
-        if(!dipState && sample <= threshold-0.1 ){
-            pthread_mutex_lock(&dipLock); 
-            num_dips++; 
-            pthread_mutex_unlock(&dipLock); 
-            dipState = true; 
-        }
-       
     }
+
+    pthread_mutex_lock(&dipLock); 
+    num_dips = dips; 
+    pthread_mutex_unlock(&dipLock); 
 
     free(historyCopy); 
 

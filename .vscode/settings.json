@@ -1,16 +1,7 @@
 {
     "files.associations": {
-<<<<<<< HEAD
-        "pthread.h": "c",
-        "stdio.h": "c",
-        "periodtimer.h": "c",
-        "stdlib.h": "c",
-        "sampler.h": "c",
-        "a2d.h": "c"
-    },
-    "cmake.configureOnOpen": true
-=======
-        "udplistener.h": "c"
+        "udplistener.h": "c",
+        "time.h": "c",
+        "stdio.h": "c"
     }
->>>>>>> origin/udp
 }
