@@ -24,11 +24,9 @@ void* Terminal_startDisplay() {
     while(1) {
         secondAhead = getTimeInMs() + 1000; 
         int sampleNum = Sampler_getHistorySize();
-        //TODO: Raw value from the POT, and how many hertz (Hz) this is for the PWM (section 1.5 )
         int potRaw = getVoltage0Reading();
         int freq = potRaw/40;
         double avgLightLvl = convertA2D(Sampler_getAverageReading());
-        //TODO: dips
         int dips = getNumDips();
         //TODO: timing jitter info
         
