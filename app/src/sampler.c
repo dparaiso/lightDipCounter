@@ -6,6 +6,7 @@
 #include <time.h>
 #include <stdio.h> 
 #include <stdbool.h> 
+#include "periodTimer.h"
 
 static pthread_t ptid; 
 static double weighting_value = 0.001;
@@ -61,6 +62,7 @@ void Sampler_moveCurrentDataToHistory(){
     while(getTimeInMs() < secondAhead){ 
 
         lightSample = getVoltage1Reading();
+        Period_markEvent(PERIOD_EVENT_SAMPLE_LIGHT);
 
         Sampler_exponentialAvgCalculator(lightSample);
  
@@ -124,11 +126,9 @@ void countDips(){
     long long dips = 0; 
     for(int i = 0; i < historySize; i++){
         double sample = convertA2D(historyCopy[i]); 
-        // printf("samples: %f\n", sample);
         if(!dipState && sample <= threshold-0.1 ){
             dips++;
             dipState = true;
-            printf("dips: %lld\n", dips);
             // flag = 0; 
 
         }

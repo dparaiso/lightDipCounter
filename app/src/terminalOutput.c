@@ -29,7 +29,10 @@ void* Terminal_startDisplay() {
         double avgLightLvl = convertA2D(Sampler_getAverageReading());
         int dips = getNumDips();
         //TODO: timing jitter info
+        Period_statistics_t pStats;
+        Period_getStatisticsAndClear(PERIOD_EVENT_SAMPLE_LIGHT, &pStats);
         
+
         char line1[] = "#Smpl/s = %.3d\tPOT @ %.4d => %.3dHz\tavg = %.3fV\tdips = %.3d\tSmpl ms[ %.3f, %.3f] avg %.3f/%.3d\n";
         
         char line2[1024];
@@ -45,11 +48,11 @@ void* Terminal_startDisplay() {
         for(int i =0; i < histLen; i++) {
             float histVal = convertA2D(doubleHist[i*histInc]);
             char sampleStr[330];
-            snprintf(sampleStr, 330, "%.3d:%.3f  ", i*histInc, histVal);
+            snprintf(sampleStr, 330, "%d:%.3f  ", i*histInc, histVal);
             strncat(line2, sampleStr, 330);
         }
         strncat(line2, "\n\n\0", 3);
-        printf(line1, sampleNum, potRaw, freq, avgLightLvl, dips);
+        printf(line1, sampleNum, potRaw, freq, avgLightLvl, dips, pStats.minPeriodInMs, pStats.maxPeriodInMs, pStats.avgPeriodInMs, sampleNum);
         printf(line2);
         free(doubleHist);
         if(secondAhead - getTimeInMs() > 0) {

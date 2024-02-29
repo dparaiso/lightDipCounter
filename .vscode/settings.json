@@ -3,6 +3,7 @@
         "udplistener.h": "c",
         "time.h": "c",
         "stdio.h": "c",
-        "periodtimer.h": "c"
+        "periodtimer.h": "c",
+        "terminaloutput.h": "c"
     }
 }

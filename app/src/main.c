@@ -9,10 +9,12 @@
 #include "udpListener.h"
 #include "terminalOutput.h"
 #include "hal/led.h"
+#include "periodTimer.h"
 // #include "hal/led.h"
 
 int main()
 {
+    Period_init();
     segDisplay_init();
     LED_init();
     Sampler_init();
@@ -24,6 +26,7 @@ int main()
     Terminal_cleanup();
     Sampler_cleanup(); 
     segDisplay_cancel();
+    Period_cleanup();
     return 0; 
 
 }

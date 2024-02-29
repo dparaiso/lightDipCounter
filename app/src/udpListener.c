@@ -134,7 +134,7 @@ static void UDP_parseAndSend(int sockId, char* buff, int bytesRead) {
   send(sockId, msg, sizeof(char)*(strlen(msg)+1), 0);
 }
 
-void* UDP_startListening(void* args) {
+void* UDP_startListening() {
   struct sockaddr_in addr;
   struct sockaddr_in client;
   int sockId = socket(AF_INET, SOCK_DGRAM, 0);
@@ -152,7 +152,6 @@ void* UDP_startListening(void* args) {
     exit(EXIT_FAILURE);
   }
 
-  printf("Listening on port: %d\n", PORT);
   char buff[BUFFER_SIZE];
   int clientLen = sizeof(client);
 
