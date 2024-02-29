@@ -34,9 +34,7 @@ void* Sampler_readSamples(){
 
     while(1){
         Sampler_moveCurrentDataToHistory();
-
         countDips(); 
-        // printf("%lld\n", getNumDips());
     }
     return NULL; 
 }
@@ -126,18 +124,18 @@ void countDips(){
     long long dips = 0; 
     for(int i = 0; i < historySize; i++){
         double sample = convertA2D(historyCopy[i]); 
-
+        // printf("samples: %f\n", sample);
         if(!dipState && sample <= threshold-0.1 ){
             dips++;
             dipState = true;
+            printf("dips: %lld\n", dips);
             // flag = 0; 
 
         }
 
-        if(dipState && sample > threshold - 0.07){
+        if(dipState && sample > threshold - 0.09){
             dipState = false; 
         }
-
     }
 
     pthread_mutex_lock(&dipLock); 
