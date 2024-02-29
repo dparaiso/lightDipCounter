@@ -22,6 +22,7 @@ void LED_init(){
 
 void LED_cleanup(){
     pthread_cancel(ptid); 
+    pthread_join(ptid, NULL);
 }
 
 void* LED_setPWM(){

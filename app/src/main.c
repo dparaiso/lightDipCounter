@@ -21,7 +21,6 @@ int main()
     Terminal_init();
     UDP_init(); 
 
-    // UDP_cleanup();
     LED_cleanup(); 
     Terminal_cleanup();
     Sampler_cleanup(); 

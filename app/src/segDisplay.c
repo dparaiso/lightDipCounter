@@ -51,6 +51,7 @@ void segDisplay_init(){
 void segDisplay_cancel(){
     // close(i2cFileDesc); 
     pthread_cancel(ptid); 
+	pthread_join(ptid, NULL);
 }
 
 void* displayNum(){

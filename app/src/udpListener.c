@@ -11,8 +11,6 @@
 #include "sampler.h"
 #include "hal/A2D.h"
 
-#define PORT 12345
-#define BUFFER_SIZE 16384 //16384
 pthread_t tid; 
 char lastBuff [BUFFER_SIZE];
 

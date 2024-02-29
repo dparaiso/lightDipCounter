@@ -29,6 +29,7 @@ void Sampler_init(void){
 
 void Sampler_cleanup(void){
     pthread_cancel(ptid); 
+    pthread_join(ptid, NULL);
 }
 
 void* Sampler_readSamples(){

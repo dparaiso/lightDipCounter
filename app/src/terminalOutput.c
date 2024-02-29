@@ -13,10 +13,11 @@ static pthread_t tid;
 
 void Terminal_init() {
     pthread_create(&tid, NULL, &Terminal_startDisplay, NULL);
-    // pthread_join(tid, NULL);
+    
 }
 void Terminal_cleanup() {
     pthread_cancel(tid);
+    pthread_join(tid, NULL);
 }
 
 void* Terminal_startDisplay() {
@@ -51,10 +52,10 @@ void* Terminal_startDisplay() {
             snprintf(sampleStr, 330, "%d:%.3f  ", i*histInc, histVal);
             strncat(line2, sampleStr, 330);
         }
+        free(doubleHist);
         strncat(line2, "\n\n\0", 3);
         printf(line1, sampleNum, potRaw, freq, avgLightLvl, dips, pStats.minPeriodInMs, pStats.maxPeriodInMs, pStats.avgPeriodInMs, sampleNum);
         printf(line2);
-        free(doubleHist);
         if(secondAhead - getTimeInMs() > 0) {
            sleepForMs(secondAhead - getTimeInMs()); 
         }
