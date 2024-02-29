@@ -1,3 +1,6 @@
+// A2D.h
+// Module to read light sensor and potentiometer values. Also converts analog signal to digital. 
+//
 #ifndef _A2D_H_
 #define _A2D_H_
 

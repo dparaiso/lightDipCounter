@@ -1,6 +1,12 @@
-// Sample button module 
-// Part of the Hardware Abstraction Layer (HAL) 
-
+// segDisplay.h
+// Module to write to 14-seg display in the background
+//
+// It continuously samples the number of dips and displays it on the 14-seg display. 
+//
+// The application will do a number of actions each second which must
+// be synchronized (such as computing dips and printing to the screen).
+// It also checks that the pins are exported and writes to the pins to make them 
+// ready to display output. 
 #ifndef _SEGDISPLAY_H_
 #define _SEGDISPLAY_H_
 

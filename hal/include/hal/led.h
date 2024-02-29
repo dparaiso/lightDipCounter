@@ -1,3 +1,10 @@
+// LED.h
+// Module to write PWM light levels to the LED.
+//
+// It continuously writes to the LED and reads from the potentiometer to produce 
+// PWM output 
+
+// The application includes thread management, running commands, and time management
 #ifndef _LED_H_
 #define _LED_H_
 
