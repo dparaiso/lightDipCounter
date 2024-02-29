@@ -7,6 +7,8 @@
 #include "segDisplay.h"
 #include "sampler.h"
 #include "udpListener.h"
+#include "terminalOutput.h"
+#include "hal/led.h"
 // #include "hal/led.h"
 
 int main()
@@ -14,9 +16,12 @@ int main()
     segDisplay_init();
     LED_init();
     Sampler_init();
+    Terminal_init();
     UDP_init(); 
+
     // UDP_cleanup();
     LED_cleanup(); 
+    Terminal_cleanup();
     Sampler_cleanup(); 
     segDisplay_cancel();
     return 0; 

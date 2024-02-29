@@ -3,6 +3,6 @@
 
 void Terminal_init();
 void Terminal_cleanup();
-void Terminal_startDisplay();
+void* Terminal_startDisplay();
 
 #endif

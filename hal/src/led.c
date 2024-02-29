@@ -2,7 +2,8 @@
 #include "hal/A2D.h"
 #include <stdio.h> 
 #include <stdlib.h> 
-#include <pthread.h> 
+#include <pthread.h>
+#include <time.h> 
 
 static pthread_t ptid;  
 static double frequency = 0; 
@@ -34,7 +35,6 @@ void* LED_setPWM(){
 void LED_updateFrequency(int a2dsignal){
     double newfrequency = (double)a2dsignal/40;
     long long period = 0;  
-
     if(newfrequency == 0){
         newfrequency = 0; 
         if(newfrequency == frequency){

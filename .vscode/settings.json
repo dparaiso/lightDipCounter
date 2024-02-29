@@ -2,6 +2,7 @@
     "files.associations": {
         "udplistener.h": "c",
         "time.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "periodtimer.h": "c"
     }
 }
